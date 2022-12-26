@@ -18,13 +18,20 @@ gs4_auth(token = drive_token())
 drive_user()
 
 data_file <- drive_get("Coffee Brew Log")
-sheet_id <- as_sheets_id(data_file)
-gs4_get(data_file)
+metadata <- gs4_get(data_file)
+s_sheet_id <- data_file$id
+w_sheet_names <- sheet_names(data_file)
+target_w_sheet <- w_sheet_names[1]
 
-data <- read_sheet(sheet_id)
-head(data)
+data <- read_sheet(
+          ss = s_sheet_id, 
+          sheet = target_w_sheet, 
+          col_types = "iDcccccccDnnncniiiic"
+        )
+glimpse(data)
+tail(data)
 
-# Define UI for application that draws a histogram
+# Define UI for inputting brew data and outputting updated table
 ui <- fluidPage(
 
     # Application title
@@ -40,6 +47,8 @@ ui <- fluidPage(
               choices = c("Create New Record" = "new",
                           "Edit Existing Record" = "edit")
               ),
+            
+            # dynamic input if input$record_type == "edit" then require brew_id
             
             # date input for brew date
             dateInput(
@@ -78,7 +87,19 @@ ui <- fluidPage(
 # Define server logic
 server <- function(input, output) {
   # edit existing record or write new
-  
+  if (input$record_type == "new") {
+    # sheet_append(
+      # data = create a table using input parameters, brew_id = max(brew_id) + 1
+      # ss = sheet_id,
+      # sheet = "Data"
+  } else {
+    #sheet_write(
+      # where input$brew_id == "brew_id"
+      # data = create a table using input parameters,
+      # ss = sheet_id,
+      # sheet = "Data"
+    #)
+  }
   # generate table output
   
 }
