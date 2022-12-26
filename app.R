@@ -4,43 +4,83 @@
 #
 
 library(shiny)
+library(tidyverse)
+library(googledrive)
+library(googlesheets4)
+
+#######################################################
+# temporary setup code
+#######################################################
+
+# authenticate
+drive_auth(email = NA)
+gs4_auth(token = drive_token())
+drive_user()
+
+data_file <- drive_get("Coffee Brew Log")
+sheet_id <- as_sheets_id(data_file)
+gs4_get(data_file)
+
+data <- read_sheet(sheet_id)
+head(data)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
 
     # Application title
-    titlePanel("Old Faithful Geyser Data"),
+    titlePanel("Coffee Brewing Data Editor"),
 
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
         sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
+            # radio input to select edit or create new
+            radioButtons(
+              inputId = "record_type",
+              label = "Select:",
+              choices = c("Create New Record" = "new",
+                          "Edit Existing Record" = "edit")
+              ),
+            
+            # date input for brew date
+            dateInput(
+              inputId = "brew_date",
+              label = "Select the brew date:",
+              value = today()
+            )
+            # text input for roaster
+            # text input for country of origin
+            # text input for lot/farm/region
+            # text input for process
+            # text input for variety
+            # text input for altitude
+            # date input for roast date
+            # number input for coffee weight
+            # number input for water weight
+            # text input for grinder
+            # number input for grind setting
+            # number input for flavor score
+            # number input for acidity score
+            # number input for sweetness score
+            # number input for body score
+            # text input for notes
+          
+          # ideally, text inputs would be select inputs based on existing values, 
+          #   or "other" which opens a text input
         ),
 
         # Show a plot of the generated distribution
         mainPanel(
-           plotOutput("distPlot")
+           # display table output
         )
     )
 )
 
-# Define server logic required to draw a histogram
+# Define server logic
 server <- function(input, output) {
-
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
-    })
+  # edit existing record or write new
+  
+  # generate table output
+  
 }
 
 # Run the application 
