@@ -8,6 +8,7 @@ library(tidyverse)
 library(googledrive)
 library(googlesheets4)
 library(lubridate)
+library(DT)
 
 #######################################################
 # temporary setup code
@@ -110,13 +111,15 @@ ui <- fluidPage(
             # number input for Coffee Weight (g)
             numericInput(
               inputId = "coffee_weight",
-              label = "Enter the weight of coffee used for this brew:"
+              label = "Enter the weight of coffee used for this brew:",
+              value = 0
             ),
             
             # number input for Water Weight (g)
             numericInput(
               inputId = "water_weight",
-              label = "Enter the weight of water used for this brew:"
+              label = "Enter the weight of water used for this brew:",
+              value = 0
             ),
             
             # text input for Grinder
@@ -128,13 +131,15 @@ ui <- fluidPage(
             # number input for Grind Size
             numericInput(
               inputId = "grind_setting",
-              label = "Enter the grind setting:"
+              label = "Enter the grind setting:",
+              value = 0
             ),
             
             # number input for Flavor Score
             numericInput(
               inputId = "flavor_score",
               label = "Enter the flavor score:",
+              value = 0,
               min = 0,
               max = 5,
               step = 0.5
@@ -144,6 +149,7 @@ ui <- fluidPage(
             numericInput(
               inputId = "acidity_score",
               label = "Enter the acidity score:",
+              value = 0,
               min = 0,
               max = 5,
               step = 0.5
@@ -153,6 +159,7 @@ ui <- fluidPage(
             numericInput(
               inputId = "sweet_score",
               label = "Enter the sweetness score:",
+              value = 0,
               min = 0,
               max = 5,
               step = 0.5
@@ -162,6 +169,7 @@ ui <- fluidPage(
             numericInput(
               inputId = "body_score",
               label = "Enter the body score:",
+              value = 0,
               min = 0,
               max = 5,
               step = 0.5
@@ -171,6 +179,12 @@ ui <- fluidPage(
             textInput(
               inputId = "notes",
               label = "Enter notes about the brew:"
+            ),
+            
+            # action button to enter changes
+            actionButton(
+              inputId = "update_table",
+              label = "Add / Update Brew"
             )
             
           # ideally, text inputs would be select inputs based on existing values, 
@@ -180,7 +194,7 @@ ui <- fluidPage(
         # Display outputs in the main panel
         mainPanel(
           # display table output
-          datatableOutput(outputId = "table")
+          dataTableOutput(outputId = "table")
         )
     )
 )
@@ -188,22 +202,32 @@ ui <- fluidPage(
 # Define server logic
 server <- function(input, output) {
   # edit existing record or write new
-  # if (input$record_type == "new") {
-  #   # sheet_append(
-  #     # data = create a table using input parameters, brew_id = max(brew_id) + 1
-  #     # ss = sheet_id,
-  #     # sheet = "Data"
-  # } else {
-  #   #sheet_write(
-  #     # where input$brew_id == "brew_id"
-  #     # data = create a table using input parameters,
-  #     # ss = sheet_id,
-  #     # sheet = "Data"
-  #   #)
-  # }
+  add_record <- eventReactive(
+    input$update_table {
+      # if (input$record_type == "new") {
+      #   # sheet_append(
+      #     # data = create a table using input parameters, brew_id = max(brew_id) + 1
+      #     # ss = sheet_id,
+      #     # sheet = "Data"
+      # } else {
+      #   #sheet_write(
+      #     # where input$brew_id == "brew_id"
+      #     # data = create a table using input parameters,
+      #     # ss = sheet_id,
+      #     # sheet = "Data"
+      #   #)
+      # }
+      
+    }
+  )
   
   # generate table output
-  output$table <- renderDataTable(data)
+  output$table <- renderDataTable(
+    data,
+    options = list(
+      pageLength = 25
+    )
+  )
 }
 
 # Run the application 
