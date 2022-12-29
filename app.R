@@ -54,10 +54,12 @@ ui <- fluidPage(
               inputId = "record_type",
               label = "Select:",
               choices = c("Create New Record",
-                          "Edit Existing Record")
+                          "Edit Existing Record"),
+              selected = 0
               ),
             
-            # dynamic input if input$record_type == "edit" then require BrewID
+            # dynamic input for BrewID depending on input$record_type selection
+            uiOutput("brew_id"),
             
             # date input for (brew) Date
             dateInput(
@@ -214,7 +216,15 @@ ui <- fluidPage(
 # Define server logic
 server <- function(input, output) {
   
-  # Reset values
+  # reactive UI for entering BrewID based on record type selection
+  output$brew_id <- renderUI({
+    textInput(
+      inputId = "brew_id", 
+      label = "Enter Brew ID:"
+    )
+  })
+  
+  # Reset values if reset button is pressed
   observeEvent(input$reset, {
     updateDateInput(inputId = "brew_date", value = today())
     updateTextInput(inputId = "method", value = "")
@@ -236,30 +246,37 @@ server <- function(input, output) {
     updateTextInput(inputId = "notes", value = "")
   })
   
-  # pull column names from data source
-  reactive(
-    column_names <- colnames(data)
-  )
-  
-  # create data frame from inputs
-  reactive(
+  # create data frame from inputs when update_table is pressed
+  eventReactive(
+    input$record_type,
     change_record <- data.frame(
       BrewID = if (input$record_type == "new") {max(BrewID) + 1
       } else {
           BrewID = input$brew_id
         },
       Date = input$brew_date,
-      BrewMethod = input$method,
+      Brew_Method = input$method,
       Roaster = input$roaster,
       Origin = input$origin,
-      Lot = input$region
-      # not complete
-      # need to fix column names
-      # can I do this dynamically?
+      Lot_Farm_Region = input$region,
+      Process = input$process,
+      Variety = input$variety,
+      Altitude = input$altitude,
+      Roast_Date = input$roast_date,
+      Coffee_Weight_g = input$coffee_weight,
+      Water_Weight_g = input$water_weight,
+      Brew_Ratio = input$water_weight / input$coffee_weight,
+      Grinder = input$grinder,
+      Grind_Size = input$grind_setting,
+      Flavor_Score = input$flavor_score,
+      Acidity_Score = input$acidity_score,
+      Sweetness_Score = input$sweet_score,
+      Body_Score = input$body_score,
+      Notes = input$notes
     )  
   )
   
-  # edit existing record or write new
+  # edit existing record or write new when update_table button is pressed
   eventReactive(
     input$update_table, {
       if (input$record_type == "new") {
@@ -270,8 +287,7 @@ server <- function(input, output) {
         )
       } else {
         sheet_write(
-          # where input$brew_id == "brew_id",
-          data = change_record,
+          data = change_record %>% filter(input$brew_id == data$BrewID),
           ss = sheet_id,
           sheet = "Data"
         )
@@ -284,8 +300,12 @@ server <- function(input, output) {
   output$table <- renderDataTable(
     data,
     options = list(
-      pageLength = 25#,
-      #order = "desc"
+      pageLength = 20,
+      order = list(1, "desc"),
+      rownames = FALSE,
+      class = 'cell-border stripe',
+      autoWidth = TRUE,
+      columnDefs = list(list(width = '300px', targets = c(6,20)))
     )
   )
 }
