@@ -300,11 +300,14 @@ server <- function(input, output) {
   output$table <- renderDataTable(
     data,
     options = list(
-      pageLength = 20,
+      pageLength = 10,
+      lengthMenu = c(5, 10, 20),
       order = list(1, "desc"),
       rownames = FALSE,
       class = 'cell-border stripe',
       autoWidth = TRUE,
+      scrollX = TRUE, scrollY = 1000,
+      scrollCollapse=TRUE,
       columnDefs = list(list(width = '300px', targets = c(6,20)))
     )
   )
