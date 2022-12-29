@@ -55,11 +55,11 @@ ui <- fluidPage(
               label = "Select:",
               choices = c("Create New Record",
                           "Edit Existing Record"),
-              selected = 0
+              selected = character(0)
               ),
             
             # dynamic input for BrewID depending on input$record_type selection
-            uiOutput("brew_id"),
+            uiOutput("brew_id"), # -> not responsive, always displays
             
             # date input for (brew) Date
             dateInput(
@@ -189,6 +189,14 @@ ui <- fluidPage(
               label = "Enter notes about the brew:"
             ),
             
+            # -> need to clean up button layout
+            
+            # action button to confirm changes
+            actionButton(
+              inputId = "confirm_data",
+              label = "Confirm Brew Data"
+            ),
+            
             # action button to enter changes
             actionButton(
               inputId = "update_table",
@@ -201,14 +209,14 @@ ui <- fluidPage(
               label = "Reset Data Fields"
             )
             
-          # ideally, text inputs would be select inputs based on existing values, 
+          # -> ideally, text inputs would be select inputs based on existing values, 
           #   or "other" which opens a text input
         ),
 
         # Display outputs in the main panel
         mainPanel(
           # display table output
-          dataTableOutput(outputId = "table")
+          DTOutput(outputId = "table")
         )
     )
 )
@@ -248,7 +256,7 @@ server <- function(input, output) {
   
   # create data frame from inputs when update_table is pressed
   eventReactive(
-    input$record_type,
+    input$confirm_data,
     change_record <- data.frame(
       BrewID = if (input$record_type == "new") {max(BrewID) + 1
       } else {
@@ -297,20 +305,22 @@ server <- function(input, output) {
   )
   
   # generate table output
-  output$table <- renderDataTable(
+  output$table <- renderDT(
     data,
     options = list(
       pageLength = 10,
       lengthMenu = c(5, 10, 20),
       order = list(1, "desc"),
       rownames = FALSE,
-      class = 'cell-border stripe',
+      class = "cell-border stripe", # -> still not displaying
       autoWidth = TRUE,
-      scrollX = TRUE, scrollY = 1000,
+      scrollX = TRUE, scrollY = 600,
       scrollCollapse=TRUE,
       columnDefs = list(list(width = '300px', targets = c(6,20)))
     )
   )
+  
+  # -> Need some way to refresh table once a record has been added/edited
 }
 
 # Run the application 
