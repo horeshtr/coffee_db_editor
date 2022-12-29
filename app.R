@@ -5,6 +5,7 @@
 
 library(shiny)
 library(tidyverse)
+library(dplyr)
 library(googledrive)
 library(googlesheets4)
 library(lubridate)
@@ -32,6 +33,11 @@ data <- read_sheet(
         )
 glimpse(data)
 tail(data)
+
+
+#######################################################
+# app code
+#######################################################
 
 # Define UI for inputting brew data and outputting updated table
 ui <- fluidPage(
@@ -185,6 +191,12 @@ ui <- fluidPage(
             actionButton(
               inputId = "update_table",
               label = "Add / Update Brew"
+            ),
+            
+            # action button to reset fields
+            actionButton(
+              inputId = "reset",
+              label = "Reset Data Fields"
             )
             
           # ideally, text inputs would be select inputs based on existing values, 
@@ -201,23 +213,70 @@ ui <- fluidPage(
 
 # Define server logic
 server <- function(input, output) {
+  
+  # Reset values
+  observeEvent(input$reset, {
+    updateDateInput(inputId = "brew_date", value = today())
+    updateTextInput(inputId = "method", value = "")
+    updateTextInput(inputId = "roaster", value = "")
+    updateTextInput(inputId = "origin", value = "")
+    updateTextInput(inputId = "region", value = "")
+    updateTextInput(inputId = "process", value = "")
+    updateTextInput(inputId = "variety", value = "")
+    updateTextInput(inputId = "altitude", value = "")
+    updateDateInput(inputId = "roast_date", value = today())
+    updateNumericInput(inputId = "coffee_weight", value = 0)
+    updateNumericInput(inputId = "water_weight", value = 0)
+    updateTextInput(inputId = "grinder", value = "")
+    updateNumericInput(inputId = "grind_setting", value = 0)
+    updateNumericInput(inputId = "flavor_score", value = 0)
+    updateNumericInput(inputId = "acidity_score", value = 0)
+    updateNumericInput(inputId = "sweet_score", value = 0)
+    updateNumericInput(inputId = "body_score", value = 0)
+    updateTextInput(inputId = "notes", value = "")
+  })
+  
+  # pull column names from data source
+  reactive(
+    column_names <- colnames(data)
+  )
+  
+  # create data frame from inputs
+  reactive(
+    change_record <- data.frame(
+      BrewID = if (input$record_type == "new") {max(BrewID) + 1
+      } else {
+          BrewID = input$brew_id
+        },
+      Date = input$brew_date,
+      BrewMethod = input$method,
+      Roaster = input$roaster,
+      Origin = input$origin,
+      Lot = input$region
+      # not complete
+      # need to fix column names
+      # can I do this dynamically?
+    )  
+  )
+  
   # edit existing record or write new
-  add_record <- eventReactive(
-    input$update_table {
-      # if (input$record_type == "new") {
-      #   # sheet_append(
-      #     # data = create a table using input parameters, brew_id = max(brew_id) + 1
-      #     # ss = sheet_id,
-      #     # sheet = "Data"
-      # } else {
-      #   #sheet_write(
-      #     # where input$brew_id == "brew_id"
-      #     # data = create a table using input parameters,
-      #     # ss = sheet_id,
-      #     # sheet = "Data"
-      #   #)
-      # }
-      
+  eventReactive(
+    input$update_table, {
+      if (input$record_type == "new") {
+        sheet_append(
+        data = change_record,
+        ss = sheet_id,
+        sheet = "Data"
+        )
+      } else {
+        sheet_write(
+          # where input$brew_id == "brew_id",
+          data = change_record,
+          ss = sheet_id,
+          sheet = "Data"
+        )
+      }
+
     }
   )
   
@@ -225,7 +284,8 @@ server <- function(input, output) {
   output$table <- renderDataTable(
     data,
     options = list(
-      pageLength = 25
+      pageLength = 25#,
+      #order = "desc"
     )
   )
 }
