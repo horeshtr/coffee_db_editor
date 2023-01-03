@@ -36,6 +36,58 @@ tail(data)
 
 
 #######################################################
+# testing
+#######################################################
+record_type <- "edit"
+brew_id <- 3461
+change_record <- data.frame(
+  BrewID = if (record_type == "new") {max(data$BrewID) + 1
+  } else {
+    BrewID = brew_id
+  },
+  Date = as.Date.character("2025-06-06", format = "%Y%m%d"),
+  Brew_Method = "V60",
+  Roaster = "Unknown",
+  Origin = "India",
+  Lot_Farm_Region = "",
+  Process = "Natural",
+  Variety = "Typica",
+  Altitude = "1600",
+  Roast_Date = "2025-05-06",
+  Coffee_Weight_g = 15,
+  Water_Weight_g = 225,
+  Brew_Ratio = 225 / 15,
+  Grinder = "1zpresso K-Max",
+  Grind_Size = 5.5,
+  Flavor_Score = 4,
+  Acidity_Score = 4,
+  Sweetness_Score = 4,
+  Body_Score = 4,
+  Notes = "Amazing"
+)  
+
+
+if (record_type == "new") {
+      sheet_append(
+        data = change_record,
+        ss = s_sheet_id,
+        sheet = target_w_sheet
+      )
+    } else {
+      row <- brew_id + 1
+      range <- paste0("A", row, ":", "T", row)
+      
+      range_write(
+        ss = s_sheet_id,
+        data = change_record,
+        sheet = target_w_sheet,
+        range = range,
+        col_names = FALSE
+      )
+    }
+
+
+#######################################################
 # app code
 #######################################################
 
@@ -258,7 +310,7 @@ server <- function(input, output) {
   eventReactive(
     input$confirm_data,
     change_record <- data.frame(
-      BrewID = if (input$record_type == "new") {max(BrewID) + 1
+      BrewID = if (input$record_type == "new") {max(data$BrewID) + 1
       } else {
           BrewID = input$brew_id
         },
@@ -290,14 +342,19 @@ server <- function(input, output) {
       if (input$record_type == "new") {
         sheet_append(
         data = change_record,
-        ss = sheet_id,
-        sheet = "Data"
+        ss = s_sheet_id,
+        sheet = target_w_sheet
         )
       } else {
-        sheet_write(
-          data = change_record %>% filter(input$brew_id == data$BrewID),
-          ss = sheet_id,
-          sheet = "Data"
+        row <- brew_id + 1
+        range <- paste0("A", row, ":", "T", row)
+        
+        range_write(
+          ss = s_sheet_id,
+          data = change_record,
+          sheet = target_w_sheet,
+          range = range,
+          col_names = FALSE
         )
       }
 
