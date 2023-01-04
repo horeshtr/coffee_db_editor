@@ -36,58 +36,6 @@ tail(data)
 
 
 #######################################################
-# testing
-#######################################################
-record_type <- "edit"
-brew_id <- 3461
-change_record <- data.frame(
-  BrewID = if (record_type == "new") {max(data$BrewID) + 1
-  } else {
-    BrewID = brew_id
-  },
-  Date = as.Date.character("2025-06-06", format = "%Y%m%d"),
-  Brew_Method = "V60",
-  Roaster = "Unknown",
-  Origin = "India",
-  Lot_Farm_Region = "",
-  Process = "Natural",
-  Variety = "Typica",
-  Altitude = "1600",
-  Roast_Date = "2025-05-06",
-  Coffee_Weight_g = 15,
-  Water_Weight_g = 225,
-  Brew_Ratio = 225 / 15,
-  Grinder = "1zpresso K-Max",
-  Grind_Size = 5.5,
-  Flavor_Score = 4,
-  Acidity_Score = 4,
-  Sweetness_Score = 4,
-  Body_Score = 4,
-  Notes = "Amazing"
-)  
-
-
-if (record_type == "new") {
-      sheet_append(
-        data = change_record,
-        ss = s_sheet_id,
-        sheet = target_w_sheet
-      )
-    } else {
-      row <- brew_id + 1
-      range <- paste0("A", row, ":", "T", row)
-      
-      range_write(
-        ss = s_sheet_id,
-        data = change_record,
-        sheet = target_w_sheet,
-        range = range,
-        col_names = FALSE
-      )
-    }
-
-
-#######################################################
 # app code
 #######################################################
 
@@ -236,7 +184,7 @@ ui <- fluidPage(
             ),
             
             # text input for Notes
-            textInput(
+            textAreaInput(
               inputId = "notes",
               label = "Enter notes about the brew:"
             ),
@@ -249,16 +197,22 @@ ui <- fluidPage(
               label = "Confirm Brew Data"
             ),
             
-            # action button to enter changes
-            actionButton(
-              inputId = "update_table",
-              label = "Add / Update Brew"
-            ),
-            
             # action button to reset fields
             actionButton(
               inputId = "reset",
               label = "Reset Data Fields"
+            ),
+            
+            # action button to enter changes
+            actionButton(
+              inputId = "write_data",
+              label = "Add / Update Brew"
+            ),
+            
+            # action button to refresh table
+            actionButton(
+              inputId = "refresh_table",
+              label = "Refresh Table"
             )
             
           # -> ideally, text inputs would be select inputs based on existing values, 
@@ -303,7 +257,7 @@ server <- function(input, output) {
     updateNumericInput(inputId = "acidity_score", value = 0)
     updateNumericInput(inputId = "sweet_score", value = 0)
     updateNumericInput(inputId = "body_score", value = 0)
-    updateTextInput(inputId = "notes", value = "")
+    updateTextAreaInput(inputId = "notes", value = "")
   })
   
   # create data frame from inputs when update_table is pressed
@@ -336,9 +290,9 @@ server <- function(input, output) {
     )  
   )
   
-  # edit existing record or write new when update_table button is pressed
+  # edit existing record or write new when write_data button is pressed
   eventReactive(
-    input$update_table, {
+    input$write_data, {
       if (input$record_type == "new") {
         sheet_append(
         data = change_record,
@@ -378,6 +332,7 @@ server <- function(input, output) {
   )
   
   # -> Need some way to refresh table once a record has been added/edited
+  
 }
 
 # Run the application 
