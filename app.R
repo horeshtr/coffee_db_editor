@@ -272,7 +272,7 @@ server <- function(input, output) {
   eventReactive(
     input$confirm_data,
     change_record <- data.frame(
-      BrewID = if (input$record_type == "new") {max(data$BrewID) + 1
+      BrewID = if (input$record_type == "Create New Record") {max(data$BrewID) + 1
       } else {
           BrewID = input$brew_id
         },
@@ -299,9 +299,9 @@ server <- function(input, output) {
   )
   
   # edit existing record or write new when write_data button is pressed
-  eventReactive(
+  observeEvent(
     input$write_data, {
-      if (input$record_type == "new") {
+      if (input$record_type == "Create New Record") {
         sheet_append(
         data = change_record,
         ss = s_sheet_id,
