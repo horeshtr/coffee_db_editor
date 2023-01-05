@@ -269,9 +269,9 @@ server <- function(input, output) {
   })
   
   # create data frame from inputs when update_table is pressed
-  eventReactive(
+  change_record <- eventReactive(
     input$confirm_data,
-    change_record <- data.frame(
+    data.frame(
       BrewID = if (input$record_type == "Create New Record") {max(data$BrewID) + 1
       } else {
           BrewID = input$brew_id
@@ -303,7 +303,7 @@ server <- function(input, output) {
     input$write_data, {
       if (input$record_type == "Create New Record") {
         sheet_append(
-        data = change_record,
+        data = change_record(),
         ss = s_sheet_id,
         sheet = target_w_sheet
         )
@@ -313,7 +313,7 @@ server <- function(input, output) {
         
         range_write(
           ss = s_sheet_id,
-          data = change_record,
+          data = change_record(),
           sheet = target_w_sheet,
           range = range,
           col_names = FALSE
