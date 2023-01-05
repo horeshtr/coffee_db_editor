@@ -20,19 +20,25 @@ drive_auth(email = NA)
 gs4_auth(token = drive_token())
 drive_user()
 
+# Set the specific file
 data_file <- drive_get("Coffee Brew Log")
 metadata <- gs4_get(data_file)
+
+# Get the spreadsheet ID
 s_sheet_id <- data_file$id
+
+# Get worksheet names
 w_sheet_names <- sheet_names(data_file)
+
+# Set the target worksheet to read from and write to
 target_w_sheet <- w_sheet_names[1]
 
+# Read in the existing data
 data <- read_sheet(
           ss = s_sheet_id, 
           sheet = target_w_sheet, 
           col_types = "iDcccccccDnnncniiiic"
         )
-glimpse(data)
-tail(data)
 
 
 #######################################################
@@ -55,7 +61,7 @@ ui <- fluidPage(
               label = "Select:",
               choices = c("Create New Record",
                           "Edit Existing Record"),
-              selected = character(0)
+              selected = "Create New Record"
               ),
             
             # dynamic input for BrewID depending on input$record_type selection
@@ -232,10 +238,12 @@ server <- function(input, output) {
   
   # reactive UI for entering BrewID based on record type selection
   output$brew_id <- renderUI({
-    textInput(
-      inputId = "brew_id", 
-      label = "Enter Brew ID:"
-    )
+    if(input$record_type == "Edit Existing Record") {
+      textInput(
+        inputId = "brew_id", 
+        label = "Enter Brew ID:"
+      )
+    }
   })
   
   # Reset values if reset button is pressed
