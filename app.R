@@ -321,7 +321,9 @@ server <- function(input, output) {
         sheet = target_w_sheet
         )
       } else {
-        row <- brew_id + 1
+        
+        # Update brew is not functioning:
+        row <- input$brew_id + 1  # "non-numeric argument to binary operator"
         range <- paste0("A", row, ":", "T", row)
         
         range_write(
@@ -336,9 +338,13 @@ server <- function(input, output) {
     }
   )
   
-  # generate table output
-  output$table <- renderDT(
-    data_rv$data,
+  # Generate table output
+  output$table <- renderDT({
+    input$refresh_table
+      # Table refreshes when Refresh button is pressed, but no new data displayed
+      #   Is data not being reread from Sheets? 
+    DT::datatable(
+    isolate(data_rv$data),
     options = list(
       pageLength = 10,
       lengthMenu = c(5, 10, 20),
@@ -349,10 +355,9 @@ server <- function(input, output) {
       scrollX = TRUE, scrollY = 600,
       scrollCollapse=TRUE,
       columnDefs = list(list(width = '300px', targets = c(6,20)))
+      )
     )
-  )
-  
-  # Refresh table when Refresh button is pressed
+  })
 
 }
 
