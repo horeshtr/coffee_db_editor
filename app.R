@@ -65,7 +65,7 @@ ui <- fluidPage(
               ),
             
             # dynamic input for BrewID depending on input$record_type selection
-            uiOutput("brew_id"), # -> not responsive, always displays
+            uiOutput("brew_id"), 
             
             # date input for (brew) Date
             dateInput(
@@ -236,6 +236,9 @@ ui <- fluidPage(
 # Define server logic
 server <- function(input, output) {
   
+  # Store data frame as reactiveValues
+  data_rv <- reactiveValues(data = data)
+  
   # reactive UI for entering BrewID based on record type selection
   output$brew_id <- renderUI({
     if(input$record_type == "Edit Existing Record") {
@@ -266,6 +269,8 @@ server <- function(input, output) {
     updateNumericInput(inputId = "sweet_score", value = 0)
     updateNumericInput(inputId = "body_score", value = 0)
     updateTextAreaInput(inputId = "notes", value = "")
+    
+    showModal(modalDialog("Data fields reset.", size = "s", easyClose = TRUE))
   })
   
   # create data frame from inputs when update_table is pressed
@@ -297,6 +302,14 @@ server <- function(input, output) {
       Notes = input$notes
     )  
   )
+  # Are fields formatted correctly? Dates do not seem to be when they write to Sheets
+  
+  # Confirmation Message
+  observeEvent(
+    input$confirm_data, {
+    showModal(modalDialog("Data Confirmed!", size = "s", easyClose = TRUE))
+    }
+  )
   
   # edit existing record or write new when write_data button is pressed
   observeEvent(
@@ -325,7 +338,7 @@ server <- function(input, output) {
   
   # generate table output
   output$table <- renderDT(
-    data,
+    data_rv$data,
     options = list(
       pageLength = 10,
       lengthMenu = c(5, 10, 20),
@@ -339,8 +352,8 @@ server <- function(input, output) {
     )
   )
   
-  # -> Need some way to refresh table once a record has been added/edited
-  
+  # Refresh table when Refresh button is pressed
+
 }
 
 # Run the application 
