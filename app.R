@@ -16,13 +16,22 @@ library(DT)
 #######################################################
 
 # authenticate
+
 drive_auth(email = NA)
 gs4_auth(token = drive_token())
 drive_user()
 
-# Set the specific file
+# Set the specific file and get metadata
 data_file <- drive_get("Coffee Brew Log")
-metadata <- gs4_get(data_file)
+
+metadata_func <- function(file_name){
+  base_data <- gs4_get(file_name)
+  mod_time <- drive_reveal(file = file_name, what = "modified_time") %>%
+    select(modified_time)
+  cbind(base_data, mod_time)
+}
+metadata <- metadata_func(data_file)
+last_modified <- max(metadata$modified_time)
 
 # Get the spreadsheet ID
 s_sheet_id <- data_file$id
@@ -242,15 +251,19 @@ server <- function(input, output) {
   # reactive UI for entering BrewID based on record type selection
   output$brew_id <- renderUI({
     if(input$record_type == "Edit Existing Record") {
-      textInput(
+      numericInput(
         inputId = "brew_id", 
-        label = "Enter Brew ID:"
+        label = "Enter Brew ID:",
+        value = max(data$BrewID) - 10,
+        min = min(data$BrewID),
+        step = 1
       )
     }
   })
   
   # Reset values if reset button is pressed
   observeEvent(input$reset, {
+    updateNumericInput(inputId = "brew_id", value = max(data$BrewID) - 10)
     updateDateInput(inputId = "brew_date", value = today())
     updateTextInput(inputId = "method", value = "")
     updateTextInput(inputId = "roaster", value = "")
@@ -281,15 +294,17 @@ server <- function(input, output) {
       } else {
           BrewID = input$brew_id
         },
-      Date = input$brew_date,
+      Date = as.Date(input$brew_date, "%Y/%m/%d"),   
+        # ^ writes to sheet in 2023-01-07 format, same for roast date
       Brew_Method = input$method,
-      Roaster = input$roaster,
+      Roaster = input$roaster,  
+        # ^ writes to sheet in italics
       Origin = input$origin,
       Lot_Farm_Region = input$region,
       Process = input$process,
       Variety = input$variety,
       Altitude = input$altitude,
-      Roast_Date = input$roast_date,
+      Roast_Date = as.Date(input$roast_date, "%Y/%m/%d"), 
       Coffee_Weight_g = input$coffee_weight,
       Water_Weight_g = input$water_weight,
       Brew_Ratio = input$water_weight / input$coffee_weight,
@@ -319,11 +334,11 @@ server <- function(input, output) {
         data = change_record(),
         ss = s_sheet_id,
         sheet = target_w_sheet
+        # is there an equivalent to reformat arg or should I use range_write instead?
         )
       } else {
         
-        # Update brew is not functioning:
-        row <- input$brew_id + 1  # "non-numeric argument to binary operator"
+        row <- input$brew_id + 1
         range <- paste0("A", row, ":", "T", row)
         
         range_write(
@@ -331,7 +346,8 @@ server <- function(input, output) {
           data = change_record(),
           sheet = target_w_sheet,
           range = range,
-          col_names = FALSE
+          col_names = FALSE,
+          reformat = FALSE
         )
       }
 
