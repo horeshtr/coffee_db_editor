@@ -15,8 +15,10 @@ library(DT)
 # temporary setup code
 #######################################################
 
-# authenticate
+# designate project-specific cache
+options(gargle_oauth_cache = ".secrets")
 
+# authenticate
 drive_auth(email = NA)
 gs4_auth(token = drive_token())
 drive_user()
@@ -243,11 +245,24 @@ ui <- fluidPage(
 )
 
 # Define server logic
-server <- function(input, output) {
+server <- function(input, output, session) {
   
-  # Store data frame as reactiveValues
-  data_rv <- reactiveValues(data = data)
-  
+  # Automated refresh of data
+  data_rv <- reactivePoll(
+    intervalMillis = 1000,
+    session = session,
+    checkFunc = function(){
+      
+    },
+    valueFunc = function(){
+      read_sheet(
+        ss = s_sheet_id,
+        sheet = target_w_sheet,
+        col_types = "iDcccccccDnnncniiiic"
+      )
+    }
+  )
+
   # reactive UI for entering BrewID based on record type selection
   output$brew_id <- renderUI({
     if(input$record_type == "Edit Existing Record") {
