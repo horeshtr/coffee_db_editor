@@ -62,7 +62,7 @@ ui <- fluidPage(
     # Sidebar with data inputs 
     sidebarLayout(
         sidebarPanel(
-            
+          
           # radio input to select edit or create new
             radioButtons(
               inputId = "record_type",
@@ -261,31 +261,6 @@ server <- function(input, output, session) {
     }
   })
   
-  # Reset values if reset button is pressed
-  observeEvent(input$reset, {
-    updateNumericInput(inputId = "brew_id", value = max(data$BrewID) - 10)
-    updateDateInput(inputId = "brew_date", value = today())
-    updateTextInput(inputId = "method", value = "")
-    updateTextInput(inputId = "roaster", value = "")
-    updateTextInput(inputId = "origin", value = "")
-    updateTextInput(inputId = "region", value = "")
-    updateTextInput(inputId = "process", value = "")
-    updateTextInput(inputId = "variety", value = "")
-    updateTextInput(inputId = "altitude", value = "")
-    updateDateInput(inputId = "roast_date", value = today())
-    updateNumericInput(inputId = "coffee_weight", value = 0)
-    updateNumericInput(inputId = "water_weight", value = 0)
-    updateTextInput(inputId = "grinder", value = "")
-    updateNumericInput(inputId = "grind_setting", value = 0)
-    updateNumericInput(inputId = "flavor_score", value = 0)
-    updateNumericInput(inputId = "acidity_score", value = 0)
-    updateNumericInput(inputId = "sweet_score", value = 0)
-    updateNumericInput(inputId = "body_score", value = 0)
-    updateTextAreaInput(inputId = "notes", value = "")
-    
-    showModal(modalDialog("Data fields reset.", size = "s", easyClose = TRUE))
-  })
-  
   # create data frame from inputs when update_table is pressed
   change_record <- eventReactive(
     input$confirm_data,
@@ -325,6 +300,32 @@ server <- function(input, output, session) {
     showModal(modalDialog("Data Confirmed!", size = "s", easyClose = TRUE))
     }
   )
+  
+  # Reset values if reset button is pressed
+  observeEvent(
+    input$reset, {
+      updateNumericInput(inputId = "brew_id", value = max(data$BrewID) - 10)
+      updateDateInput(inputId = "brew_date", value = today())
+      updateTextInput(inputId = "method", value = "")
+      updateTextInput(inputId = "roaster", value = "")
+      updateTextInput(inputId = "origin", value = "")
+      updateTextInput(inputId = "region", value = "")
+      updateTextInput(inputId = "process", value = "")
+      updateTextInput(inputId = "variety", value = "")
+      updateTextInput(inputId = "altitude", value = "")
+      updateDateInput(inputId = "roast_date", value = today())
+      updateNumericInput(inputId = "coffee_weight", value = 0)
+      updateNumericInput(inputId = "water_weight", value = 0)
+      updateTextInput(inputId = "grinder", value = "")
+      updateNumericInput(inputId = "grind_setting", value = 0)
+      updateNumericInput(inputId = "flavor_score", value = 0)
+      updateNumericInput(inputId = "acidity_score", value = 0)
+      updateNumericInput(inputId = "sweet_score", value = 0)
+      updateNumericInput(inputId = "body_score", value = 0)
+      updateTextAreaInput(inputId = "notes", value = "")
+      
+      showModal(modalDialog("Data fields reset.", size = "s", easyClose = TRUE))
+  })
   
   # edit existing record or write new when write_data button is pressed
   observeEvent(
