@@ -12,11 +12,8 @@ library(lubridate)
 library(DT)
 
 #######################################################
-# temporary setup code
+# Initial setup code
 #######################################################
-
-# designate project-specific cache
-options(gargle_oauth_cache = ".secrets")
 
 # authenticate
 drive_auth(email = NA)
@@ -46,10 +43,10 @@ target_w_sheet <- w_sheet_names[1]
 
 # Read in the existing data
 data <- read_sheet(
-          ss = s_sheet_id, 
-          sheet = target_w_sheet, 
-          col_types = "iDcccccccDnnncniiiic"
-        )
+  ss = s_sheet_id, 
+  sheet = target_w_sheet, 
+  col_types = "iDcccccccDnnncniiiic"
+  )
 
 
 #######################################################
@@ -211,25 +208,29 @@ ui <- fluidPage(
             # action button to confirm changes
             actionButton(
               inputId = "confirm_data",
-              label = "Confirm Brew Data"
+              label = "Confirm Brew Data",
+              icon = icon("check", lib = "font-awesome")
             ),
             
             # action button to reset fields
             actionButton(
               inputId = "reset",
-              label = "Reset Data Fields"
+              label = "Reset Data Fields",
+              icon = icon("eraser", lib = "font-awesome")
             ),
             
             # action button to enter changes
             actionButton(
               inputId = "write_data",
-              label = "Add / Update Brew"
+              label = "Add / Update Brew",
+              icon = icon("download", lib = "font-awesome")
             ),
             
             # action button to refresh table
             actionButton(
               inputId = "refresh_table",
-              label = "Refresh Table"
+              label = "Refresh Table",
+              icon = icon("arrows-rotate", lib = "font-awesome")
             )
             
           # -> ideally, text inputs would be select inputs based on existing values, 
@@ -247,22 +248,6 @@ ui <- fluidPage(
 # Define server logic
 server <- function(input, output, session) {
   
-  # Automated refresh of data
-  data_rv <- reactivePoll(
-    intervalMillis = 1000,
-    session = session,
-    checkFunc = function(){
-      
-    },
-    valueFunc = function(){
-      read_sheet(
-        ss = s_sheet_id,
-        sheet = target_w_sheet,
-        col_types = "iDcccccccDnnncniiiic"
-      )
-    }
-  )
-
   # reactive UI for entering BrewID based on record type selection
   output$brew_id <- renderUI({
     if(input$record_type == "Edit Existing Record") {
@@ -370,12 +355,8 @@ server <- function(input, output, session) {
   )
   
   # Generate table output
-  output$table <- renderDT({
-    input$refresh_table
-      # Table refreshes when Refresh button is pressed, but no new data displayed
-      #   Is data not being reread from Sheets? 
-    DT::datatable(
-    isolate(data_rv$data),
+  output$table <- renderDT(
+    data,
     options = list(
       pageLength = 10,
       lengthMenu = c(5, 10, 20),
@@ -386,9 +367,8 @@ server <- function(input, output, session) {
       scrollX = TRUE, scrollY = 600,
       scrollCollapse=TRUE,
       columnDefs = list(list(width = '300px', targets = c(6,20)))
-      )
     )
-  })
+  )
 
 }
 
