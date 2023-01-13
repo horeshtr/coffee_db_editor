@@ -355,8 +355,19 @@ server <- function(input, output, session) {
   )
   
   # Generate table output
+  data_refresh <- eventReactive(
+    input$refresh_table, {
+      read_sheet(
+        ss = s_sheet_id, 
+        sheet = target_w_sheet, 
+        col_types = "iDcccccccDnnncniiiic"
+      )
+    },
+    ignoreNULL = FALSE
+  )
+  
   output$table <- renderDT(
-    data,
+    data_refresh(),
     options = list(
       pageLength = 10,
       lengthMenu = c(5, 10, 20),
