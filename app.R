@@ -71,7 +71,6 @@ ui <- dashboardPage(
                tabName = "dashboard", 
                icon = icon("chart-simple", lib = "font-awesome"))
     )
-    
   ),
   
   dashboardBody(
@@ -252,14 +251,17 @@ ui <- dashboardPage(
             label = "Refresh Table",
             icon = icon("arrows-rotate", lib = "font-awesome")
           )
+        ),
+        
+        fluidRow(
+          DTOutput(outputId = "confirm_table")
         )
-        #fluidRow(#placeholder for showing change_record() data)
       ),
       
       # Data Table Tab
       tabItem(tabName = "table",
         fluidRow(
-          DTOutput(outputId = "table")  
+          DTOutput(outputId = "data_table")  
         )
       ),
       
@@ -322,10 +324,26 @@ server <- function(input, output, session) {
   )
   # Are fields formatted correctly? Dates do not seem to be when they write to Sheets
   
+  # Display table with data to be written
+  observeEvent(
+    input$confirm_data, {
+      output$confirm_table <- renderDT(
+        change_record(),
+        options = list(
+          rownames = FALSE,
+          class = "cell-border stripe", # -> still not displaying
+          autoWidth = TRUE,
+          scrollX = TRUE,
+          scrollCollapse=TRUE
+        )
+      )
+    }
+  )
+  
   # Confirmation Message
   observeEvent(
     input$confirm_data, {
-    showModal(modalDialog("Data Confirmed!", size = "s", easyClose = TRUE))
+      showModal(modalDialog("Data Confirmed!", size = "s", easyClose = TRUE))
     }
   )
   
@@ -395,7 +413,7 @@ server <- function(input, output, session) {
     ignoreNULL = FALSE
   )
   
-  output$table <- renderDT(
+  output$data_table <- renderDT(
     data_refresh(),
     options = list(
       pageLength = 10,
