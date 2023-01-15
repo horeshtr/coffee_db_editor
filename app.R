@@ -57,12 +57,21 @@ data <- read_sheet(
 # Define UI for inputting brew data and outputting updated table
 ui <- dashboardPage(
   
-  dashboardHeader("Coffee Brewing Data Editor"),
+  dashboardHeader(title = "Coffee Brewing Data Editor"),
   
   dashboardSidebar(
-    menuItem("Edit Data", tabName = "edit", icon = icon("pencil")),
-    menuItem("Data Table", tabName = "table", icon = icon("table")),
-    menuItem("Dashboard", tabName = "dashboard", icon = icon("chart-mixed"))
+    sidebarMenu(
+      menuItem("Edit Data", 
+               tabName = "edit", 
+               icon = icon("edit", lib = "font-awesome")),
+      menuItem("Data Table", 
+               tabName = "table", 
+               icon = icon("table", lib = "font-awesome")),
+      menuItem("Dashboard", 
+               tabName = "dashboard", 
+               icon = icon("chart-simple", lib = "font-awesome"))
+    )
+    
   ),
   
   dashboardBody(
@@ -256,7 +265,8 @@ ui <- dashboardPage(
       
       # Dashboard / Visuals Tab
       tabItem(tabName = "dashboard",
-              )
+        h2("Coffee Brewing Data Visualized")
+      )
       
     )
   )
