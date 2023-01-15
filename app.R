@@ -55,196 +55,213 @@ data <- read_sheet(
 #######################################################
 
 # Define UI for inputting brew data and outputting updated table
-ui <- fluidPage(
-
-    # Application title
-    titlePanel("Coffee Brewing Data Editor"),
-
-    # Sidebar with data inputs 
-    sidebarLayout(
-        sidebarPanel(
-          
+ui <- dashboardPage(
+  
+  dashboardHeader("Coffee Brewing Data Editor"),
+  
+  dashboardSidebar(
+    menuItem("Edit Data", tabName = "edit", icon = icon("pencil")),
+    menuItem("Data Table", tabName = "table", icon = icon("table")),
+    menuItem("Dashboard", tabName = "dashboard", icon = icon("chart-mixed"))
+  ),
+  
+  dashboardBody(
+    tabItems(
+      # Edit Data Tab
+      tabItem(tabName = "edit",
+        fluidRow(
           # radio input to select edit or create new
-            radioButtons(
-              inputId = "record_type",
-              label = "Select:",
-              choices = c("Create New Record",
-                          "Edit Existing Record"),
-              selected = "Create New Record"
-              ),
-            
-            # dynamic input for BrewID depending on input$record_type selection
-            uiOutput("brew_id"), 
-            
-            # date input for (brew) Date
-            dateInput(
-              inputId = "brew_date",
-              label = "Select the brew date:",
-              value = today()
-            ),
-            
-            # text input for Brew Method
-            textInput(
-              inputId = "method",
-              label = "Enter brew method used:"
-            ),
-            
-            # text input for Roaster
-            textInput(
-              inputId = "roaster",
-              label = "Enter roaster name:"
-            ),
-            
-            # text input for Origin
-            textInput(
-              inputId = "origin",
-              label = "Enter country of origin:"
-            ),
-            
-            # text input for Lot/Farm/Region
-            textInput(
-              inputId = "region",
-              label = "Enter details about the lot, farm, and region:"
-            ),
-            
-            # text input for Process
-            textInput(
-              inputId = "process",
-              label = "Enter the processing method:"
-            ),
-            
-            # text input for Variety
-            textInput(
-              inputId = "variety",
-              label = "Enter the coffee varietal:"
-            ),
-            
-            # text input for Altitude
-            textInput(
-              inputId = "altitude",
-              label = "Enter the growing altitude:"
-            ),
-            
-            # date input for Roast Date
-            dateInput(
-              inputId = "roast_date",
-              label = "Select the roast date:"
-            ),
-            
-            # number input for Coffee Weight (g)
-            numericInput(
-              inputId = "coffee_weight",
-              label = "Enter the weight of coffee used for this brew:",
-              value = 0
-            ),
-            
-            # number input for Water Weight (g)
-            numericInput(
-              inputId = "water_weight",
-              label = "Enter the weight of water used for this brew:",
-              value = 0
-            ),
-            
-            # text input for Grinder
-            textInput(
-              inputId = "grinder",
-              label = "Enter the grinder used:"
-            ),
-            
-            # number input for Grind Size
-            numericInput(
-              inputId = "grind_setting",
-              label = "Enter the grind setting:",
-              value = 0
-            ),
-            
-            # number input for Flavor Score
-            numericInput(
-              inputId = "flavor_score",
-              label = "Enter the flavor score:",
-              value = 0,
-              min = 0,
-              max = 5,
-              step = 0.5
-            ),
-            
-            # number input for Acidity Score
-            numericInput(
-              inputId = "acidity_score",
-              label = "Enter the acidity score:",
-              value = 0,
-              min = 0,
-              max = 5,
-              step = 0.5
-            ),
-            
-            # number input for Sweetness Score
-            numericInput(
-              inputId = "sweet_score",
-              label = "Enter the sweetness score:",
-              value = 0,
-              min = 0,
-              max = 5,
-              step = 0.5
-            ),
-            
-            # number input for Body Score
-            numericInput(
-              inputId = "body_score",
-              label = "Enter the body score:",
-              value = 0,
-              min = 0,
-              max = 5,
-              step = 0.5
-            ),
-            
-            # text input for Notes
-            textAreaInput(
-              inputId = "notes",
-              label = "Enter notes about the brew:"
-            ),
-            
-            # -> need to clean up button layout
-            
-            # action button to confirm changes
-            actionButton(
-              inputId = "confirm_data",
-              label = "Confirm Brew Data",
-              icon = icon("check", lib = "font-awesome")
-            ),
-            
-            # action button to reset fields
-            actionButton(
-              inputId = "reset",
-              label = "Reset Data Fields",
-              icon = icon("eraser", lib = "font-awesome")
-            ),
-            
-            # action button to enter changes
-            actionButton(
-              inputId = "write_data",
-              label = "Add / Update Brew",
-              icon = icon("download", lib = "font-awesome")
-            ),
-            
-            # action button to refresh table
-            actionButton(
-              inputId = "refresh_table",
-              label = "Refresh Table",
-              icon = icon("arrows-rotate", lib = "font-awesome")
-            )
-            
-          # -> ideally, text inputs would be select inputs based on existing values, 
-          #   or "other" which opens a text input
+          radioButtons(
+            inputId = "record_type",
+            label = "Select:",
+            choices = c("Create New Record",
+                        "Edit Existing Record"),
+            selected = "Create New Record"
+          ),
+          
+          # dynamic input for BrewID depending on input$record_type selection
+          uiOutput("brew_id"), 
+          
+          # date input for (brew) Date
+          dateInput(
+            inputId = "brew_date",
+            label = "Select the brew date:",
+            value = today()
+          ),
+          
+          # text input for Brew Method
+          textInput(
+            inputId = "method",
+            label = "Enter brew method used:"
+          ),
+          
+          # text input for Roaster
+          textInput(
+            inputId = "roaster",
+            label = "Enter roaster name:"
+          ),
+          
+          # text input for Origin
+          textInput(
+            inputId = "origin",
+            label = "Enter country of origin:"
+          ),
+          
+          # text input for Lot/Farm/Region
+          textInput(
+            inputId = "region",
+            label = "Enter details about the lot, farm, and region:"
+          ),
+          
+          # text input for Process
+          textInput(
+            inputId = "process",
+            label = "Enter the processing method:"
+          ),
+          
+          # text input for Variety
+          textInput(
+            inputId = "variety",
+            label = "Enter the coffee varietal:"
+          ),
+          
+          # text input for Altitude
+          textInput(
+            inputId = "altitude",
+            label = "Enter the growing altitude:"
+          ),
+          
+          # date input for Roast Date
+          dateInput(
+            inputId = "roast_date",
+            label = "Select the roast date:"
+          )
         ),
-
-        # Display outputs in the main panel
-        mainPanel(
-          # display table output
-          DTOutput(outputId = "table")
+        
+        fluidRow(
+          # number input for Coffee Weight (g)
+          numericInput(
+            inputId = "coffee_weight",
+            label = "Enter the weight of coffee used for this brew:",
+            value = 0
+          ),
+          
+          # number input for Water Weight (g)
+          numericInput(
+            inputId = "water_weight",
+            label = "Enter the weight of water used for this brew:",
+            value = 0
+          ),
+          
+          # text input for Grinder
+          textInput(
+            inputId = "grinder",
+            label = "Enter the grinder used:"
+          ),
+          
+          # number input for Grind Size
+          numericInput(
+            inputId = "grind_setting",
+            label = "Enter the grind setting:",
+            value = 0
+          )
+        ),
+        
+        fluidRow(
+          # number input for Flavor Score
+          numericInput(
+            inputId = "flavor_score",
+            label = "Enter the flavor score:",
+            value = 0,
+            min = 0,
+            max = 5,
+            step = 0.5
+          ),
+          
+          # number input for Acidity Score
+          numericInput(
+            inputId = "acidity_score",
+            label = "Enter the acidity score:",
+            value = 0,
+            min = 0,
+            max = 5,
+            step = 0.5
+          ),
+          
+          # number input for Sweetness Score
+          numericInput(
+            inputId = "sweet_score",
+            label = "Enter the sweetness score:",
+            value = 0,
+            min = 0,
+            max = 5,
+            step = 0.5
+          ),
+          
+          # number input for Body Score
+          numericInput(
+            inputId = "body_score",
+            label = "Enter the body score:",
+            value = 0,
+            min = 0,
+            max = 5,
+            step = 0.5
+          ),
+          
+          # text input for Notes
+          textAreaInput(
+            inputId = "notes",
+            label = "Enter notes about the brew:"
+          )
+        ),
+        
+        fluidRow(
+          # action button to confirm changes
+          actionButton(
+            inputId = "confirm_data",
+            label = "Confirm Brew Data",
+            icon = icon("check", lib = "font-awesome")
+          ),
+          
+          # action button to reset fields
+          actionButton(
+            inputId = "reset",
+            label = "Reset Data Fields",
+            icon = icon("eraser", lib = "font-awesome")
+          ),
+          
+          # action button to enter changes
+          actionButton(
+            inputId = "write_data",
+            label = "Add / Update Brew",
+            icon = icon("download", lib = "font-awesome")
+          ),
+          
+          # action button to refresh table
+          actionButton(
+            inputId = "refresh_table",
+            label = "Refresh Table",
+            icon = icon("arrows-rotate", lib = "font-awesome")
+          )
         )
+        #fluidRow(#placeholder for showing change_record() data)
+      ),
+      
+      # Data Table Tab
+      tabItem(tabName = "table",
+        fluidRow(
+          DTOutput(outputId = "table")  
+        )
+      ),
+      
+      # Dashboard / Visuals Tab
+      tabItem(tabName = "dashboard",
+              )
+      
     )
+  )
 )
+  
 
 # Define server logic
 server <- function(input, output, session) {
