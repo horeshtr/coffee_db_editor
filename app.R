@@ -307,7 +307,11 @@ ui <- dashboardPage(
       
       # Dashboard / Visuals Tab
       tabItem(tabName = "dashboard",
-        h2("Coffee Brewing Data Visualized")
+        h2("Coffee Brewing Data Visualized"),
+        fluidRow(
+          valueBoxOutput(outputId = "total_brew_value"),
+          plotOutput(outputId = "brews_by_country")
+        )
       )
       
     )
@@ -468,6 +472,28 @@ server <- function(input, output, session) {
     )
   )
 
+  # Visualizations for Dashboard tab
+  
+  # Total Brews Recorded
+  output$total_brew_value <- renderValueBox({
+    total_brew <- nrow(data)
+    
+    valueBox(
+      value = total_brew, 
+      subtitle = "Total Brews Recorded",
+      color = "light-blue",
+      width = 4)
+  })
+  
+  # Count of Brews by Country
+  output$brew_by_country <- renderPlot({
+    data %>% 
+      group_by(Origin) %>%
+      summarize(Number_of_Brews = n()) %>%
+    
+    ggplot(aes(x = Origin)) +
+      geom_col()
+  })
 }
 
 # Run the application 
