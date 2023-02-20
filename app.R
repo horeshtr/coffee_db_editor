@@ -526,7 +526,7 @@ server <- function(input, output, session) {
     data %>% 
       group_by(Origin) %>%
       summarize(Number_of_Brews = n()) %>%
-    ggplot(aes(x = Origin)) +
+    ggplot(aes(x = Origin, y = Number_of_Brews)) +
       geom_col()
   })
 }
