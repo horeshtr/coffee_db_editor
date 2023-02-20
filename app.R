@@ -54,7 +54,9 @@ data <- read_sheet(
 # app code
 #######################################################
 
-# Define UI for inputting brew data and outputting updated table
+#############################
+# UI
+#############################
 ui <- dashboardPage(
   
   dashboardHeader(title = "Coffee Brewing Data Editor"),
@@ -309,7 +311,9 @@ ui <- dashboardPage(
       tabItem(tabName = "dashboard",
         h2("Coffee Brewing Data Visualized"),
         fluidRow(
-          valueBoxOutput(outputId = "total_brew_value"),
+          valueBoxOutput(outputId = "total_brew_value")
+        ),
+        fluidRow(
           plotOutput(outputId = "brews_by_country")
         )
       )
@@ -319,7 +323,9 @@ ui <- dashboardPage(
 )
   
 
-# Define server logic
+#############################
+# SERVER
+#############################
 server <- function(input, output, session) {
   
   # reactive UI for entering BrewID based on record type selection
@@ -334,6 +340,30 @@ server <- function(input, output, session) {
       )
     }
   })
+  
+  # Use the latest record as the default values
+    # with example of default_text <- sheet_data[1, "text"]
+    # where [row num, "col name"]
+  
+  default_BrewID = data[max(data$BrewID), "BrewID"] 
+  default_Brew_Method = data[max(data$BrewID), ]
+  default_Roaster = data[max(data$BrewID), ]
+  default_Origin = data[max(data$BrewID), ]
+  default_Lot_Farm_Region = data[max(data$BrewID), ]
+  default_Process = data[max(data$BrewID), ]
+  default_Variety = data[max(data$BrewID), ]
+  default_Altitude = data[max(data$BrewID), ]
+  default_Roast_Date = as.Date(data[max(data$BrewID), ], "%Y/%m/%d")
+  default_Coffee_Weight_g = data[max(data$BrewID), ]
+  default_Water_Weight_g = data[max(data$BrewID), ]
+  default_Brew_Ratio = data[max(data$BrewID), ]
+  default_Grinder = data[max(data$BrewID), ]
+  default_Grind_Size = data[max(data$BrewID), ]
+  default_Flavor_Score = data[max(data$BrewID), ]
+  default_Acidity_Score = data[max(data$BrewID), ]
+  default_Sweetness_Score = data[max(data$BrewID), ]
+  default_Body_Score = data[max(data$BrewID), ]
+  default_Notes = data[max(data$BrewID), ]
   
   # create data frame from inputs when update_table is pressed
   change_record <- eventReactive(
@@ -479,22 +509,26 @@ server <- function(input, output, session) {
     total_brew <- nrow(data)
     
     valueBox(
-      value = total_brew, 
+      value = prettyNum(total_brew, big.mark = ","), 
       subtitle = "Total Brews Recorded",
       color = "light-blue",
       width = 4)
   })
   
   # Count of Brews by Country
-  output$brew_by_country <- renderPlot({
+  output$brews_by_country <- renderPlot({
     data %>% 
       group_by(Origin) %>%
       summarize(Number_of_Brews = n()) %>%
-    
     ggplot(aes(x = Origin)) +
       geom_col()
   })
 }
+
+
+#############################
+# APP
+#############################
 
 # Run the application 
 shinyApp(ui = ui, server = server)
