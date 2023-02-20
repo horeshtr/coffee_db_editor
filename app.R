@@ -346,7 +346,7 @@ server <- function(input, output, session) {
     # where [row num, "col name"]
   
   default_BrewID = data[max(data$BrewID), "BrewID"] 
-  default_Brew_Method = data[max(data$BrewID), ]
+  default_Brew_Method = data[max(data$BrewID), "Brew_Method"]
   default_Roaster = data[max(data$BrewID), ]
   default_Origin = data[max(data$BrewID), ]
   default_Lot_Farm_Region = data[max(data$BrewID), ]
