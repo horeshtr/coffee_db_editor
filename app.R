@@ -345,25 +345,31 @@ server <- function(input, output, session) {
     # with example of default_text <- sheet_data[1, "text"]
     # where [row num, "col name"]
   
-  default_BrewID = data[max(data$BrewID), "BrewID"] 
-  default_Brew_Method = data[max(data$BrewID), "Brew_Method"]
-  default_Roaster = data[max(data$BrewID), ]
-  default_Origin = data[max(data$BrewID), ]
-  default_Lot_Farm_Region = data[max(data$BrewID), ]
-  default_Process = data[max(data$BrewID), ]
-  default_Variety = data[max(data$BrewID), ]
-  default_Altitude = data[max(data$BrewID), ]
-  default_Roast_Date = as.Date(data[max(data$BrewID), ], "%Y/%m/%d")
-  default_Coffee_Weight_g = data[max(data$BrewID), ]
-  default_Water_Weight_g = data[max(data$BrewID), ]
-  default_Brew_Ratio = data[max(data$BrewID), ]
-  default_Grinder = data[max(data$BrewID), ]
-  default_Grind_Size = data[max(data$BrewID), ]
-  default_Flavor_Score = data[max(data$BrewID), ]
-  default_Acidity_Score = data[max(data$BrewID), ]
-  default_Sweetness_Score = data[max(data$BrewID), ]
-  default_Body_Score = data[max(data$BrewID), ]
-  default_Notes = data[max(data$BrewID), ]
+  # default_BrewID = data[max(data$BrewID), "BrewID"] 
+  # default_Brew_Method = data[max(data$Brew_Method), "Brew_Method"]
+  # default_Roaster = data[max(data$Roaster), "Roaster"]
+  # default_Origin = data[max(data$Origin), "Origin"]
+  # default_Lot_Farm_Region = data[max(data$Lot_Farm_Region), "Lot_Farm_Region"]
+  # default_Process = data[max(data$Process), "Process"]
+  # default_Variety = data[max(data$Variety), "Variety"]
+  # default_Altitude = data[max(data$Altitude), "Altitude"]
+  # default_Roast_Date = as.Date(data[max(data$Roast_Date), "Roast_Date"], "%Y/%m/%d")
+  # default_Coffee_Weight_g = data[max(data$Coffee_Weight_g), "Coffee_Weight_g"]
+  # default_Water_Weight_g = data[max(data$Water_Weight_g), "Water_Weight_g"]
+  # default_Brew_Ratio = data[max(data$Brew_Ratio), "Brew_Ratio"]
+  # default_Grinder = data[max(data$Grinder), "Grinder"]
+  # default_Grind_Size = data[max(data$Grind_Size), "Grind_Size"]
+  # default_Flavor_Score = data[max(data$Flavor_Score), "Flavor_Score"]
+  # default_Acidity_Score = data[max(data$Acidity_Score), "Acidity_Score"]
+  # default_Sweetness_Score = data[max(data$Sweetness_Score), "Sweetness_Score"]
+  # default_Body_Score = data[max(data$Body_Score), "Body_Score"]
+  # default_Notes = data[max(data$Notes), "Notes"]
+  
+  # Above defaults code errored out:
+  # Error in vectbl_as_row_location(i, nr, i_arg, assign) : 
+  #   Can't subset rows with `max(data$Roast_Date)`.
+  #   `max(data$Roast_Date)` must be logical, numeric, or character, not a <Date> object.
+ 
   
   # create data frame from inputs when update_table is pressed
   change_record <- eventReactive(
