@@ -311,7 +311,9 @@ ui <- dashboardPage(
       tabItem(tabName = "dashboard",
         h2("Coffee Brewing Data Visualized"),
         fluidRow(
-          valueBoxOutput(outputId = "total_brew_value")
+          valueBoxOutput(outputId = "total_brew_value"),
+          valueBoxOutput(outputId = "total_origins_value"),
+          valueBoxOutput(outputId = "total_roasters_value")
         ),
         fluidRow(
           plotOutput(outputId = "brews_by_country")
@@ -521,6 +523,28 @@ server <- function(input, output, session) {
       width = 4)
   })
   
+  # Total origins value box
+  output$total_origins_value <- renderValueBox({
+    total_origins <- nrow(unique(data$Origin))
+    
+    valueBox(
+      value = prettyNum(total_origin, big.mark = ","), 
+      subtitle = "Number of Different Origins",
+      color = "light-blue",
+      width = 4)
+  })
+  
+  # Total roasters value box
+  output$total_roasters_value <- renderValueBox({
+    total_roasters <- nrow(unique(data$Roaster))
+    
+    valueBox(
+      value = prettyNum(total_roasters, big.mark = ","), 
+      subtitle = "Number of Different Roasters",
+      color = "light-blue",
+      width = 4)
+  })
+  
   # Count of Brews by Country
   output$brews_by_country <- renderPlot({
     data %>% 
@@ -528,6 +552,7 @@ server <- function(input, output, session) {
       summarize(Number_of_Brews = n()) %>%
     ggplot(aes(x = Origin, y = Number_of_Brews)) +
       geom_col()
+      # angle x-axis text
   })
 }
 
