@@ -525,34 +525,36 @@ server <- function(input, output, session) {
   
   # Total origins value box
   output$total_origins_value <- renderValueBox({
-    total_origins <- nrow(unique(data$Origin))
+    total_origins <- length(unique(data$Origin))
     
     valueBox(
-      value = prettyNum(total_origin, big.mark = ","), 
-      subtitle = "Number of Different Origins",
+      value = prettyNum(total_origins, big.mark = ","), 
+      subtitle = "Different Origins",
       color = "light-blue",
       width = 4)
   })
   
   # Total roasters value box
   output$total_roasters_value <- renderValueBox({
-    total_roasters <- nrow(unique(data$Roaster))
+    total_roasters <- length(unique(data$Roaster))
     
     valueBox(
       value = prettyNum(total_roasters, big.mark = ","), 
-      subtitle = "Number of Different Roasters",
+      subtitle = "Different Roasters",
       color = "light-blue",
       width = 4)
   })
   
-  # Count of Brews by Country
+  # Count of Brews by Country for top 25%
   output$brews_by_country <- renderPlot({
     data %>% 
       group_by(Origin) %>%
       summarize(Number_of_Brews = n()) %>%
+      slice_max(order_by = Number_of_Brews, prop = 0.25) %>%
     ggplot(aes(x = Origin, y = Number_of_Brews)) +
-      geom_col()
-      # angle x-axis text
+      geom_col() + 
+      theme(axis.text.x = element_text(angle = 45))
+      # clean up axis titles, x axis labels, etc. 
   })
 }
 
